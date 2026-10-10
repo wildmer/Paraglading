@@ -1,18 +1,29 @@
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from decimal import Decimal
-from fastapi import FastAPI, Depends, HTTPException, Query, status
+from pathlib import Path
+
+from fastapi import Depends, FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import select, func, or_
+from fastapi.responses import FileResponse
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session, joinedload
+
 from app.config import settings
 from app.database import Base, engine, get_db
-from app.models import Admin, Participant, Pilot, PhotoVideo
+from app.models import Admin, Participant, PhotoVideo, Pilot
 from app.schemas import (
-    LoginInput, TokenOutput, ParticipantCreate, ParticipantUpdate, PilotCreate,
-    PilotOutput, PhotoVideoInput, PaymentUpdate, SummaryOutput
+    LoginInput,
+    ParticipantCreate,
+    ParticipantUpdate,
+    PaymentUpdate,
+    PhotoVideoInput,
+    PilotCreate,
+    PilotOutput,
+    SummaryOutput,
+    TokenOutput,
 )
-from app.security import verify_password, create_access_token, get_current_admin
+from app.security import create_access_token, get_current_admin, verify_password
 
 
 @asynccontextmanager
@@ -35,6 +46,20 @@ app.add_middleware(
 @app.get("/api/health")
 def health():
     return {"status": "ok", "service": settings.app_name}
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+DB_PATH = BASE_DIR / "parapente.db"
+
+@app.get("/api/descargar-db")
+async def descargar_db():
+    if not DB_PATH.is_file():
+        raise HTTPException(status_code=404, detail="Base de datos no encontrada")
+
+    return FileResponse(
+        path=DB_PATH,
+        filename="parapente.db",
+        media_type="application/octet-stream",
+    )
 
 
 @app.post("/api/auth/login", response_model=TokenOutput)
