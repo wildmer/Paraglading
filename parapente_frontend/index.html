@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bitácora de Vuelo — Club de Parapente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Black&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- <style></style> -->
+<link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+<div class="noise"></div>
+
+<header class="wrap">
+  <div class="topline">
+    <span class="brand"><i class="mark"></i>NATIVOX · CLUB DE PARAPENTE</span>
+    <span class="mid">MANIFIESTO DIARIO — OPERADOR DE TIERRA</span>
+    <span><span id="dateNow">—</span> · <span id="clock">--:--:--</span></span>
+  </div>
+
+  <div class="mast">
+    <h1>BITÁCORA<br><em>DE VUELO</em></h1>
+    <div class="cond">
+      <svg id="windSvg" width="112" height="96" viewBox="0 0 116 96" aria-hidden="true">
+        <line x1="16" y1="4" x2="16" y2="92" stroke="var(--ink)" stroke-width="2.5"/>
+        <circle cx="16" cy="16" r="3" fill="var(--ink)"/>
+        <g id="sockG"><g id="sockSegs"></g></g>
+        <path d="M10 92h12" stroke="var(--ink)" stroke-width="2.5"/>
+      </svg>
+      <div class="cond-data">
+        <span class="lbl">VIENTO <b id="windDir">NE</b></span>
+        <span class="val"><b id="windVal">—</b> km/h</span>
+        <span class="fine" id="windMsg">CONDICIONES ÓPTIMAS</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="authbar" id="authBar" hidden>
+    <span class="auth-user" id="authUser">—</span>
+    <button class="btn ghost sm" id="logoutBtn">Salir</button>
+  </div>
+
+  <nav class="tabs" id="tabsNav">
+    <button class="tab on" data-tab="registro"><span class="no">01</span>Registro<span class="n" id="cTabReg"></span></button>
+    <button class="tab" data-tab="manifiesto"><span class="no">02</span>Manifiesto<span class="n" id="cTabMan"></span></button>
+    <button class="tab" data-tab="foto"><span class="no">03</span>Foto & Vídeo<span class="n" id="cTabFv"></span></button>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ MÓDULO 01 · REGISTRO ============ -->
+  <section class="sec on" id="sec-registro">
+    <div class="sec-head">
+      <h2><span class="k">01 /</span>Registro de participantes</h2>
+      <p>Inscripción de pilotos pasajeros en el manifiesto del día. El peso define el orden de despegue.</p>
+    </div>
+    <div class="reg-grid">
+      <form id="regForm" class="sheet" novalidate>
+        <div class="sheet-head">FICHA DE INSCRIPCIÓN <span>N° <b id="seqNo">0000</b></span></div>
+        <div class="form-grid" style="padding:24px 26px 0;margin-bottom:0">
+          <div class="field full">
+            <label for="fNombre">Nombre completo</label>
+            <input id="fNombre" type="text" placeholder="Ej. Valentina Cruz" autocomplete="off">
+            <p class="err" data-for="fNombre"></p>
+          </div>
+          <div class="field">
+            <label for="fCorreo">Correo electrónico</label>
+            <input id="fCorreo" type="email" placeholder="nombre@correo.com" autocomplete="off">
+            <p class="err" data-for="fCorreo"></p>
+          </div>
+          <div class="field">
+            <label for="fTel">Número de teléfono</label>
+            <input id="fTel" type="tel" placeholder="300 000 0000" autocomplete="off">
+            <p class="err" data-for="fTel"></p>
+          </div>
+          <div class="field">
+            <label for="fPeso">Peso (kg)</label>
+            <input id="fPeso" type="number" min="30" max="120" step="0.1" placeholder="70">
+            <p class="err" data-for="fPeso"></p>
+          </div>
+          <div class="hint">RANGO OPERATIVO<br>30 — 150 KG</div>
+        </div>
+        <div style="padding:8px 26px 26px">
+          <button class="btn solid" type="submit">Registrar participante</button>
+        </div>
+      </form>
+
+      <aside class="sheet">
+        <div class="sheet-head">Orden de despegue <span>por peso ↑</span></div>
+        <ol id="queue"></ol>
+        <div class="reg-stats" id="regStats"></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ MÓDULO 02 · MANIFIESTO ============ -->
+  <section class="sec" id="sec-manifiesto">
+    <div class="sec-head">
+      <h2><span class="k">02 /</span>Manifiesto de vuelo</h2>
+      <p>Asigna el piloto, marca cada despegue y consulta con quién voló cada participante. Ordena la tabla por peso.</p>
+    </div>
+    <div class="mani-bar">
+      <div class="seg" id="filtros">
+        <button data-f="all" class="on">TODOS<span class="c" id="cAll">0</span></button>
+        <button data-f="ground">EN TIERRA<span class="c" id="cGround">0</span></button>
+        <button data-f="flown">VOLADOS<span class="c" id="cFlown">0</span></button>
+      </div>
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+        <div class="seg" id="orden">
+          <button data-dir="asc" class="on">PESO ↑</button>
+          <button data-dir="desc">PESO ↓</button>
+        </div>
+        <label class="search">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"/><path d="M10.6 10.6L14 14"/></svg>
+          <input id="searchInp" type="text" placeholder="BUSCAR NOMBRE O CORREO">
+        </label>
+      </div>
+    </div>
+    <div class="table-wrap sheet" style="box-shadow:6px 6px 0 rgba(27,24,19,.12)">
+      <table>
+        <thead>
+          <tr>
+            <th>N°</th>
+            <th>Participante</th>
+            <th class="sortable" id="thPeso">Peso <span class="arrow" id="pesoArrow">↑</span></th>
+            <th>Piloto</th>
+            <th>Estado</th>
+            <th>Foto / Vídeo</th>
+            <th class="ta-r">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="maniBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ MÓDULO 03 · FOTO & VÍDEO ============ -->
+  <section class="sec" id="sec-foto">
+    <div class="sec-head">
+      <h2><span class="k">03 /</span>Foto & Vídeo</h2>
+      <p>Contratación y cobro del paquete fotográfico y de vídeo de cada vuelo.</p>
+    </div>
+
+    <div class="cash">
+      <div><div class="lbl">Total contratado</div><div class="val acc" id="cashTotal">$ 0</div></div>
+      <div><div class="lbl">Cobrado</div><div class="val green" id="cashPaid">$ 0</div></div>
+      <div><div class="lbl">Por cobrar</div><div class="val amber" id="cashDue">$ 0</div></div>
+      <div><div class="lbl">Servicios activos</div><div class="val" id="cashCount">0</div></div>
+    </div>
+
+    <form class="fin-form" id="fvForm" novalidate>
+      <div class="ff-title">Habilitar servicio — paquete foto + vídeo</div>
+      <div class="field">
+        <label for="fvUser">Participante</label>
+        <select id="fvUser"><option value="">— seleccionar —</option></select>
+      </div>
+      <div class="field">
+        <label for="fvMedio">Medio de pago</label>
+        <select id="fvMedio">
+          <option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option><option>Otro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fvValor">Valor del servicio ($)</label>
+        <input id="fvValor" type="number" min="0" step="1000" placeholder="80000" style="border:0;border-bottom:1.5px solid var(--ink45);background:transparent;padding:8px 2px;font:500 14px var(--mono);color:var(--ink)">
+      </div>
+      <button class="btn solid" type="submit" style="height:42px">Habilitar</button>
+    </form>
+
+    <div class="table-wrap sheet" style="box-shadow:6px 6px 0 rgba(27,24,19,.12)">
+      <table>
+        <thead>
+          <tr>
+            <th>N°</th><th>Participante</th><th>Contratado</th><th>Medio de pago</th><th>Valor</th><th>Pago</th><th class="ta-r">Quitar</th>
+          </tr>
+        </thead>
+        <tbody id="fvBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <span id="footerStatus">Conectado a la API local</span>
+  <button id="resetBtn">Reiniciar datos de demostración</button>
+</footer>
+
+<!-- Modal Foto & Vídeo -->
+<div class="overlay" id="ovl">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="sheet-head"><span id="mTitle">Contratar servicio</span><button id="mClose" aria-label="Cerrar">×</button></div>
+    <div class="modal-body">
+      <div class="field"><label for="mUser">Participante</label><select id="mUser"></select></div>
+      <div class="field"><label>Servicio</label><input type="text" value="Paquete Foto + Vídeo (edición incluida)" disabled style="border:0;border-bottom:1.5px solid var(--ink25);background:transparent;padding:8px 2px;font:500 13px var(--sans);color:var(--ink70)"></div>
+      <div class="field"><label for="mMedio">Medio de pago</label>
+        <select id="mMedio"><option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option><option>Otro</option></select>
+      </div>
+      <div class="field"><label for="mValor">Valor ($)</label>
+        <input id="mValor" type="number" min="0" step="1000" placeholder="80000" style="border:0;border-bottom:1.5px solid var(--ink45);background:transparent;padding:8px 2px;font:500 14px var(--mono);color:var(--ink)">
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn solid" id="mSave">Habilitar servicio</button></div>
+  </div>
+</div>
+
+<!-- Modal Login -->
+<div class="overlay open" id="loginOvl">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="sheet-head"><span id="loginTitle">Acceso de encargado</span></div>
+    <form id="loginForm" class="modal-body">
+      <div class="field">
+        <label for="loginUser">Usuario</label>
+        <input id="loginUser" type="text" autocomplete="username" placeholder="encargado" value="user">
+        <p class="err" data-for="loginUser"></p>
+      </div>
+      <div class="field">
+        <label for="loginPass">Contraseña</label>
+        <input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••" value="CambiaEstaClave123!">
+        <p class="err" data-for="loginPass"></p>
+      </div>
+      <p class="login-hint" id="loginHint">Inicia sesión para acceder al manifiesto. El registro de participantes es público.</p>
+    </form>
+    <div class="modal-foot">
+      <button class="btn solid" id="loginSubmit">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script src="main.js">
+</script>
+</body>
+</html>
