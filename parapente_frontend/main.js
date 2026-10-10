@@ -20,7 +20,7 @@ const IC = {
 
 /* ================= API client ================= */
 // Cambia esta URL si tu backend corre en otro host/puerto.
-const API_BASE = 'http://127.0.0.1:8000';
+const API_BASE = 'https://paraglading.onrender.com';
 const TOKEN_KEY = 'parapente_jwt_v1';
 const TOKEN_EXP_KEY = 'parapente_jwt_exp_v1';
 const USER = 'client'
@@ -497,7 +497,22 @@ function tick(){
 }
 tick(); setInterval(tick, 1000);
 
-const windSpeed = t => Math.max(1.2, 9 + 4.5*Math.sin(t*0.21) + 3*Math.sin(t*0.53+2) + 1.5*Math.sin(t*1.7+5));
+// const windSpeed = t => {
+//     const wave =
+//         9 +
+//         4.5 * Math.sin(t * 0.21) +
+//         3 * Math.sin(t * 0.53 + 2) +
+//         1.5 * Math.sin(t * 1.7 + 5);
+
+//     return 5 + ((wave - 0) / 18) * 40;
+// };
+const windSpeed = t =>
+    25 + 20 * (
+        0.5 * Math.sin(t * 0.21) +
+        0.3 * Math.sin(t * 0.53 + 2) +
+        0.2 * Math.sin(t * 1.7 + 5)
+    );
+// const windSpeed = t => Math.max(1.2, 9 + 4.5*Math.sin(t*0.21) + 3*Math.sin(t*0.53+2) + 1.5*Math.sin(t*1.7+5));
 function drawWind(t){
   const v = windSpeed(t);
   const rot = Math.min(80, Math.max(8, 82 - v*3.4));
@@ -524,8 +539,8 @@ function drawWind(t){
   const dirs = ['NE','ENE','E'];
   $('#windDir').textContent = dirs[Math.floor((Math.sin(t*0.05)+1)*1.49)];
   const msg = $('#windMsg');
-  if(v < 6){ msg.textContent = 'VIENTO SUAVE'; msg.className = 'fine'; }
-  else if(v <= 13){ msg.textContent = 'CONDICIONES ÓPTIMAS'; msg.className = 'fine'; }
+  if(v < 10){ msg.textContent = 'VIENTO SUAVE'; msg.className = 'fine'; }
+  else if(v <= 25){ msg.textContent = 'CONDICIONES ÓPTIMAS'; msg.className = 'fine'; }
   else { msg.textContent = 'RÁFAGAS — PRECAUCIÓN'; msg.className = 'fine hot'; }
 }
 (function loop(ts){ drawWind((ts||0)/1000); requestAnimationFrame(loop); })();
