@@ -20,7 +20,7 @@ def main() -> None:
         else:
             print(f"El encargado {settings.admin_username} ya existe; no se cambió la contraseña.")
         if db.scalar(select(Pilot.id).limit(1)) is None:
-            db.add_all([Pilot(nombre=n) for n in ["Ernesto", "Julian"]])
+            db.add_all([Pilot(nombre=n) for n in ["Ernesto", "Julian", "Jovani"]])
             # db.add_all([Pilot(nombre=n) for n in ["C. Mora", "A. Ríos", "J. Peña", "L. Gómez"]])
             print("Se agregaron los pilotos de demostración. Puedes editarlos desde la API.")
         db.commit()
