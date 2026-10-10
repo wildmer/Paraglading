@@ -55,7 +55,9 @@
   <section class="sec on" id="sec-registro">
     <div class="sec-head">
       <h2><span class="k">01 /</span>Registro de participantes</h2>
-      <p>Inscripción de pilotos pasajeros en el manifiesto del día. El peso define el orden de despegue.</p>
+      <p>Hecho con <span class="heart">♥</span> por <a style="font-size: 14px;" href="https://api.whatsapp.com/send?phone=3209218612&text=Hola, *Will*">Will</a> · <span id="year"></span></p>
+      <p>Inscripción de pasajeros en el manifiesto del día. <br>El peso define el orden de despegue.</p>
+
     </div>
     <div class="reg-grid">
       <form id="regForm" class="sheet" novalidate>
@@ -232,6 +234,9 @@
 
 <div id="toasts"></div>
 
+<script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+</script>
 <script src="main.js">
 </script>
 </body>

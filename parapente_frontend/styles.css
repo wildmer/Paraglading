@@ -200,3 +200,24 @@ footer{margin:60px 0 32px;padding-top:15px;border-top:2px solid var(--ink);displ
 /* Loader overlay */
 .app-loading{position:fixed;inset:0;background:var(--paper);display:flex;align-items:center;justify-content:center;z-index:700;font:500 12px var(--mono);letter-spacing:.1em;color:var(--ink70)}
 .app-loading.hide{display:none}
+
+.heart {
+    color: #e63946;
+    display: inline-block;
+    animation: heartbeat 1s infinite;
+}
+
+@keyframes heartbeat {
+    0%, 100% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.7);
+    }
+    50% {
+        transform: scale(1);
+    }
+    75% {
+        transform: scale(1.7);
+    }
+}
